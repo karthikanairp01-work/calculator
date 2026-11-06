@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trip Cost Calculator</title>
+    <title>STAR Building Materials | Delivery Cost Calculator</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -11,20 +11,106 @@
 
 <div class="container">
 
-    <h1>Trip Cost Calculator</h1>
+    <!-- Header -->
 
-    <label>Destination Address</label>
+    <div class="header-card">
 
-    <input
-        id="destination"
-        type="text"
-        placeholder="Enter destination">
+        <div class="header-content">
 
-    <div id="suggestions"></div>
+            <div>
+                <h1>🚚 Delivery Cost Calculator</h1>
+                <p>STAR Building Materials</p>
+            </div>
 
-    <button id="calculateBtn">
-        Calculate
-    </button>
+        </div>
+
+    </div>
+
+    <!-- Input Section -->
+
+    <div class="card">
+
+        <h2>Trip Information</h2>
+
+        <div class="origin-card">
+
+            <div class="origin-label">
+                Starting Location
+            </div>
+
+            <div class="origin-value">
+                📍 16 Speers Road
+            </div>
+
+            <div class="origin-city">
+                Winnipeg, Manitoba R2J 1L8
+            </div>
+
+        </div>
+
+        <label class="section-label">
+            Delivery Address
+        </label>
+
+        <input
+            id="destination"
+            type="text"
+            placeholder="Start typing a destination address">
+
+        <div id="suggestions"></div>
+
+        <label class="section-label">
+            Delivery Crew
+        </label>
+
+        <div class="crew-toggle">
+
+            <input
+                type="radio"
+                id="crew1"
+                name="crewSize"
+                value="1"
+                checked>
+
+            <label for="crew1">
+                👤 1 Person
+            </label>
+
+            <input
+                type="radio"
+                id="crew2"
+                name="crewSize"
+                value="2">
+
+            <label for="crew2">
+                👥 2 People
+            </label>
+
+        </div>
+
+        <div class="fuel-card">
+
+            <div class="fuel-header">
+                Current Diesel Price
+            </div>
+
+            <div id="currentFuel" class="fuel-price">
+                Loading...
+            </div>
+
+            <div id="fuelUpdated" class="fuel-date">
+                Loading...
+            </div>
+
+        </div>
+
+        <button id="calculateBtn">
+            Calculate Delivery Charge
+        </button>
+
+    </div>
+
+    <!-- Results -->
 
     <div id="results"></div>
 

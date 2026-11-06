@@ -5,33 +5,17 @@ const ORIGIN = {
     lon: -97.0739435
 };
 
-// Truck Data
 const VEHICLE = {
-
-    labourRate: 30.01,
-
+    lr: 30.01,
     fuelConsumption: 38,
-
-    annualKm: 236538,
-
-    depreciation: 168040.11,
-
-    insurance: 31700.23,
-
-    maintenance: 65478.27
+    CostPerKm = 1.12;
 };
 
 let dieselPrice = 0;
 
-// ------------------------
-// Load Fuel Price
-// ------------------------
-
 async function loadFuelPrice() {
-
     const response =
         await fetch("./config.json");
-
     const data =
         await response.json();
 
@@ -40,10 +24,6 @@ async function loadFuelPrice() {
 }
 
 loadFuelPrice();
-
-// ------------------------
-// Address Suggestions
-// ------------------------
 
 const addressInput =
     document.getElementById("destination");
@@ -98,9 +78,6 @@ addressInput.addEventListener(
     }
 );
 
-// ------------------------
-// Calculate Button
-// ------------------------
 
 document
 .getElementById("calculateBtn")
@@ -109,9 +86,6 @@ document
     calculateTrip
 );
 
-// ------------------------
-// Main Calculation
-// ------------------------
 
 async function calculateTrip() {
 
@@ -137,7 +111,6 @@ async function calculateTrip() {
     const destinationLat =
         coords[1];
 
-    // Route
 
     const routeResponse =
         await fetch(
@@ -157,7 +130,6 @@ async function calculateTrip() {
     const oneWayTime =
         route.time / 3600;
 
-    // Business Rules
 
     const totalDistance =
         oneWayDistance * 2;
@@ -167,7 +139,7 @@ async function calculateTrip() {
 
     const labourCost =
         totalTime *
-        VEHICLE.labourRate;
+        VEHICLE.lr;
 
     const fuelCost =
         (
@@ -178,17 +150,9 @@ async function calculateTrip() {
         *
         dieselPrice;
 
-    const vehicleCostPerKm =
-        (
-            VEHICLE.depreciation +
-            VEHICLE.insurance +
-            VEHICLE.maintenance
-        )
-        /
-        VEHICLE.annualKm;
 
     const vehicleCost =
-        vehicleCostPerKm *
+        VEHICLE.CostPerKm *
         totalDistance;
 
     const totalCost =
