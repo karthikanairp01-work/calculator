@@ -36,7 +36,7 @@ jobs:
 
           TODAY=$(date +%F)
 
-          cat > fuel-config.json << EOF
+          cat > config.json << EOF
           {
             "dieselPrice": $PRICE,
             "updated": "$TODAY"
@@ -50,7 +50,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-          git add fuel-config.json
+          git add config.json
 
           git diff --staged --quiet || \
           git commit -m "Update fuel price"
