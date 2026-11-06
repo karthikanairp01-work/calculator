@@ -6,21 +6,37 @@ const ORIGIN = {
 };
 
 const VEHICLE = {
-    lr: 30.01,
+    labourRate: 30.01,
     fuelConsumption: 38,
-    CostPerKm = 1.12
+    costPerKm: 1.12
 };
 
 let dieselPrice = 0;
+let fuelUpdated = "";
 
 async function loadFuelPrice() {
-    const response =
-        await fetch("./config.json");
-    const data =
-        await response.json();
 
-    dieselPrice =
-        data.dieselPrice;
+    try {
+
+        const response =
+            await fetch("./config.json");
+
+        const data =
+            await response.json();
+
+        dieselPrice =
+            Number(data.dieselPrice);
+
+        fuelUpdated =
+            data.updated;
+
+    } catch(error){
+
+        console.error(
+            "Unable to load config.json",
+            error
+        );
+    }
 }
 
 loadFuelPrice();
@@ -78,7 +94,6 @@ addressInput.addEventListener(
     }
 );
 
-
 document
 .getElementById("calculateBtn")
 .addEventListener(
@@ -86,106 +101,214 @@ document
     calculateTrip
 );
 
+function formatHours(hours){
 
-async function calculateTrip() {
+    const h =
+        Math.floor(hours);
+
+    const m =
+        Math.round(
+            (hours - h) * 60
+        );
+
+    if(h === 0){
+
+        return `${m}m`;
+    }
+
+    return `${h}h ${m}m`;
+}
+
+async function calculateTrip(){
+
+    if(!dieselPrice){
+
+        alert(
+            "Fuel price unavailable. Please refresh the page."
+        );
+
+        return;
+    }
 
     const address =
-        addressInput.value;
+        addressInput.value.trim();
 
-    const geoResponse =
-        await fetch(
-            `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${GEOAPIFY_KEY}`
+    if(!address){
+
+        alert(
+            "Please enter a delivery address."
         );
 
-    const geoData =
-        await geoResponse.json();
+        return;
+    }
 
-    const coords =
-        geoData.features[0]
-        .geometry
-        .coordinates;
-
-    const destinationLon =
-        coords[0];
-
-    const destinationLat =
-        coords[1];
-
-
-    const routeResponse =
-        await fetch(
-            `https://api.geoapify.com/v1/routing?waypoints=${ORIGIN.lat},${ORIGIN.lon}|${destinationLat},${destinationLon}&mode=drive&apiKey=${GEOAPIFY_KEY}`
+    const crewSize =
+        Number(
+            document.querySelector(
+                'input[name="crewSize"]:checked'
+            ).value
         );
 
-    const routeData =
-        await routeResponse.json();
+    try{
 
-    const route =
-        routeData.features[0]
-        .properties;
+        const geoResponse =
+            await fetch(
+                `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(address)}&apiKey=${GEOAPIFY_KEY}`
+            );
 
-    const oneWayDistance =
-        route.distance / 1000;
+        const geoData =
+            await geoResponse.json();
 
-    const oneWayTime =
-        route.time / 3600;
+        const coords =
+            geoData.features[0]
+            .geometry
+            .coordinates;
 
+        const destinationLon =
+            coords[0];
 
-    const totalDistance =
-        oneWayDistance * 2;
+        const destinationLat =
+            coords[1];
 
-    const totalTime =
-        oneWayTime * 2;
+        const routeResponse =
+            await fetch(
+                `https://api.geoapify.com/v1/routing?waypoints=${ORIGIN.lat},${ORIGIN.lon}|${destinationLat},${destinationLon}&mode=drive&apiKey=${GEOAPIFY_KEY}`
+            );
 
-    const labourCost =
-        totalTime *
-        VEHICLE.lr;
+        const routeData =
+            await routeResponse.json();
 
-    const fuelCost =
-        (
-            totalDistance / 100
-        )
-        *
-        VEHICLE.fuelConsumption
-        *
-        dieselPrice;
+        const route =
+            routeData.features[0]
+            .properties;
 
+        const oneWayDistance =
+            route.distance / 1000;
 
-    const vehicleCost =
-        VEHICLE.CostPerKm *
-        totalDistance;
+        const oneWayTime =
+            route.time / 3600;
 
-    const totalCost =
-        labourCost +
-        fuelCost +
-        vehicleCost;
+        const totalDistance =
+            oneWayDistance * 2;
 
-    const roundedCost =
-        Math.round(totalCost / 5) * 5;
+        const totalTime =
+            oneWayTime * 2;
 
-    document.getElementById("results").innerHTML = `
-    
-    <h3>Results</h3>
+        const labourCost =
+            totalTime *
+            VEHICLE.labourRate *
+            crewSize;
 
-    <p><b>One-Way Distance:</b> ${oneWayDistance.toFixed(2)} KM</p>
+        const fuelCost =
+            (
+                totalDistance / 100
+            )
+            *
+            VEHICLE.fuelConsumption
+            *
+            dieselPrice;
 
-    <p><b>Total Distance:</b> ${totalDistance.toFixed(2)} KM</p>
+        const vehicleCost =
+            VEHICLE.costPerKm *
+            totalDistance;
 
-    <p><b>One-Way Time:</b> ${oneWayTime.toFixed(2)} Hours</p>
+        const totalCost =
+            labourCost +
+            fuelCost +
+            vehicleCost;
 
-    <p><b>Total Time:</b> ${totalTime.toFixed(2)} Hours</p>
+        const roundedCost =
+            Math.round(totalCost / 5) * 5;
 
-    <p><b>Diesel Price:</b> $${dieselPrice.toFixed(3)}</p>
+        document.getElementById(
+            "results"
+        ).innerHTML = `
 
-    <p><b>Labour Cost:</b> $${labourCost.toFixed(2)}</p>
+<div class="metrics">
 
-    <p><b>Fuel Cost:</b> $${fuelCost.toFixed(2)}</p>
+    <div class="metric">
+        <div class="metric-title">
+            Distance
+        </div>
 
-    <p><b>Vehicle Cost:</b> $${vehicleCost.toFixed(2)}</p>
+        <div class="metric-value">
+            ${totalDistance.toFixed(2)} KM
+        </div>
+    </div>
 
-    <p><b>Total Cost:</b> $${totalCost.toFixed(2)}</p>
+    <div class="metric">
+        <div class="metric-title">
+            Travel Time
+        </div>
 
-    <h2>Rounded Cost: $${roundedCost.toFixed(2)}</h2>
-    
-    `;
+        <div class="metric-value">
+            ${formatHours(totalTime)}
+        </div>
+    </div>
+
+    <div class="metric">
+        <div class="metric-title">
+            Crew
+        </div>
+
+        <div class="metric-value">
+            ${crewSize}
+        </div>
+    </div>
+
+    <div class="metric">
+        <div class="metric-title">
+            Diesel
+        </div>
+
+        <div class="metric-value">
+            $${dieselPrice.toFixed(3)}
+        </div>
+    </div>
+
+</div>
+
+<div class="summary-card">
+
+    <h3>Delivery Summary</h3>
+
+    <div class="summary-row">
+        <span>Origin Yard</span>
+        <span>16 Speers Road</span>
+    </div>
+
+    <div class="summary-row">
+        <span>Destination</span>
+        <span>${address}</span>
+    </div>
+
+    <div class="summary-row">
+        <span>Fuel Updated</span>
+        <span>${fuelUpdated}</span>
+    </div>
+
+</div>
+
+<div class="rounded">
+
+    <div class="quote-label">
+        Estimated Delivery Charge
+    </div>
+
+    <div class="amount">
+        $${roundedCost.toFixed(0)}
+    </div>
+
+</div>
+
+`;
+
+    } catch(error){
+
+        console.error(error);
+
+        alert(
+            "Unable to calculate route."
+        );
+    }
 }
