@@ -8,7 +8,7 @@ const ORIGIN = {
 const VEHICLE = {
     lr: 30.01,
     fuelConsumption: 38,
-    CostPerKm = 1.12;
+    CostPerKm = 1.12
 };
 
 let dieselPrice = 0;
