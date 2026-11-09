@@ -1,8 +1,8 @@
 const GEOAPIFY_KEY = "734a9afc29864d52ad71ee7bae4c9521";
 
 const ORIGIN = {
-    lat: 49.8751544,
-    lon: -97.0739435
+    lat: 23.9000,
+    lon: -34.9006
 };
 
 const VEHICLE = {
