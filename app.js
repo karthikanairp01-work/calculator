@@ -6,7 +6,7 @@ const ORIGIN = {
 };
 
 const VEHICLE = {
-    labourRate: 30.01,
+    labourRate: 20.80,
     fuelConsumption: 38,
     costPerKm: 1.12
 };
