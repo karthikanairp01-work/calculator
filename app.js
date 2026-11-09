@@ -274,7 +274,7 @@ async function calculateTrip(){
 
     <div class="summary-row">
         <span>Origin Yard</span>
-        <span>16 Speers Road</span>
+        <span>Test</span>
     </div>
 
     <div class="summary-row">
